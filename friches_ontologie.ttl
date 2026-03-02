@@ -1,0 +1,166 @@
+# Ontologie CNIG Friches — RDF/Turtle
+# Dérivée du standard CNIG Friches (Frictionless Data, 51 champs)
+# Source : https://github.com/cnigfr/schema-friches
+# Auteur : Valentin Dardenne — Mars 2026
+
+@prefix cnig:    <http://cnig.gouv.fr/ontologies/friches#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+
+
+# ------------------------------------------------------------------------------
+# Déclaration de l'ontologie
+# dcterms pour les métadonnées — alignement GeoDCAT-AP / DCAT-AP
+# ------------------------------------------------------------------------------
+
+<http://cnig.gouv.fr/ontologies/friches#>
+    rdf:type            owl:Ontology ;
+    dcterms:title       "Ontologie CNIG Friches"@fr ;
+    dcterms:title       "CNIG Brownfield Ontology"@en ;
+    dcterms:description "Ontologie OWL dérivée du standard CNIG Friches. Modélise les 51 champs du standard pour exploitation RAG/LLM et connexions sémantiques inter-standards."@fr ;
+    dcterms:creator     "Valentin Dardenne" ;
+    dcterms:date        "2026-03"^^xsd:gYearMonth ;
+    dcterms:source      <https://github.com/cnigfr/schema-friches> ;
+    owl:versionInfo     "1.0.0" .
+
+
+# ------------------------------------------------------------------------------
+# Classes
+# Structure calée sur le modèle conceptuel UML du standard
+# Chaque classe regroupe les champs partageant le même préfixe dans le CSV
+# ------------------------------------------------------------------------------
+
+cnig:Friche
+    rdf:type     owl:Class ;
+    rdfs:label   "Friche"@fr ;
+    rdfs:label   "Brownfield"@en ;
+    rdfs:comment "Site ayant accueilli une activité passée, en attente de reconversion."@fr ;
+    skos:exactMatch <https://schema.data.gouv.fr/cnigfr/schema-friches/> .
+
+cnig:Localisation
+    rdf:type     owl:Class ;
+    rdfs:label   "Localisation"@fr ;
+    rdfs:comment "Informations géographiques et administratives : commune, département, région. Champs comm_*, dep_*, reg_*."@fr .
+
+cnig:Batiment
+    rdf:type     owl:Class ;
+    rdfs:label   "Bâtiment"@fr ;
+    rdfs:comment "Caractéristiques du bâti existant sur le site. Champs bati_*."@fr .
+
+cnig:Proprietaire
+    rdf:type     owl:Class ;
+    rdfs:label   "Propriétaire"@fr ;
+    rdfs:comment "Propriétaire(s) foncier(s) du site, codifiés selon les fichiers fonciers DGFiP. Champs proprio_*."@fr .
+
+cnig:Pollution
+    rdf:type     owl:Class ;
+    rdfs:label   "Pollution"@fr ;
+    rdfs:comment "État de pollution des sols et sous-sols. Champs sol_*. Lien thématique avec CNIG Geostandards-Risques."@fr .
+
+cnig:Urbanisme
+    rdf:type     owl:Class ;
+    rdfs:label   "Urbanisme"@fr ;
+    rdfs:comment "Zonage PLU applicable au site. Champs urba_*."@fr ;
+    # urba_zone_type (U/AU/A/N) référence directement les zones définies dans le standard CNIG PLU
+    # → connexion sémantique inter-standards documentée
+    skos:relatedMatch <https://github.com/cnigfr/schema-plan-local-urbanisme> .
+
+cnig:Source
+    rdf:type     owl:Class ;
+    rdfs:label   "Source"@fr ;
+    rdfs:comment "Producteur et diffuseur de la donnée (EPF, DREAL, collectivité...). Champs source_*."@fr .
+
+cnig:Activite
+    rdf:type     owl:Class ;
+    rdfs:label   "Activité"@fr ;
+    rdfs:comment "Activité économique passée ou projetée sur le site. Champs acti_*."@fr ;
+    # acti_secteur — correspondance sémantique potentielle avec le standard CNIG Sites économiques
+    skos:relatedMatch <https://github.com/cnigfr/schema-sites-economiques> .
+
+
+# ------------------------------------------------------------------------------
+# Object Properties — relations entre classes
+# ------------------------------------------------------------------------------
+
+cnig:aLocalisation
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Localisation .
+
+cnig:aBatiment
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Batiment .
+
+cnig:aProprietaire
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Proprietaire .
+
+cnig:aPollution
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Pollution .
+
+cnig:aUrbanisme
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Urbanisme .
+
+cnig:aSource
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Source .
+
+cnig:aActivite
+    rdf:type    owl:ObjectProperty ;
+    rdfs:domain cnig:Friche ;
+    rdfs:range  cnig:Activite .
+
+
+# ------------------------------------------------------------------------------
+# Data Properties — attributs des classes
+# Types xsd: calés sur les types Frictionless Data du standard source
+# ------------------------------------------------------------------------------
+
+# Friche
+cnig:site_id       rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Friche ;        rdfs:range xsd:string .
+cnig:site_nom      rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Friche ;        rdfs:range xsd:string .
+cnig:site_type     rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Friche ;        rdfs:range xsd:string .
+cnig:site_statut   rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Friche ;        rdfs:range xsd:string .
+cnig:site_surface  rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Friche ;        rdfs:range xsd:float .
+
+# Localisation
+cnig:comm_nom      rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Localisation ;  rdfs:range xsd:string .
+cnig:comm_insee    rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Localisation ;  rdfs:range xsd:string .
+cnig:dep_nom       rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Localisation ;  rdfs:range xsd:string .
+cnig:reg_nom       rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Localisation ;  rdfs:range xsd:string .
+
+# Bâtiment
+cnig:bati_nombre   rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Batiment ;      rdfs:range xsd:integer .
+cnig:bati_surface  rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Batiment ;      rdfs:range xsd:float .
+cnig:bati_etat     rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Batiment ;      rdfs:range xsd:string .
+
+# Pollution
+cnig:sol_pollution_existe   rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Pollution ;    rdfs:range xsd:string .
+cnig:sol_pollution_origine  rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Pollution ;    rdfs:range xsd:string .
+
+# Urbanisme
+cnig:urba_zone_type  rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Urbanisme ;   rdfs:range xsd:string .
+cnig:urba_zone_lib   rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Urbanisme ;   rdfs:range xsd:string .
+
+# Propriétaire
+cnig:proprio_type  rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Proprietaire ;  rdfs:range xsd:string .
+cnig:proprio_nom   rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Proprietaire ;  rdfs:range xsd:string .
+
+# Source
+cnig:source_nom        rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Source ;    rdfs:range xsd:string .
+cnig:source_producteur rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Source ;    rdfs:range xsd:string .
+
+# Activité
+cnig:acti_nom      rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Activite ;      rdfs:range xsd:string .
+cnig:acti_secteur  rdf:type owl:DatatypeProperty ; rdfs:domain cnig:Activite ;      rdfs:range xsd:string .
